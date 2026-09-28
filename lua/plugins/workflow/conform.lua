@@ -1,0 +1,35 @@
+-- template https://github.com/stevearc/conform.nvim/blob/master/doc/recipes.md#lazy-loading-with-lazynvim
+-- added only for verilog
+-- Format-buffer keymap is <leader>lf, defined once in lua/keymaps/lsp.lua
+-- (it previously also lived here as <leader>f, which shadowed the "find"
+-- namespace -- removed to avoid the duplicate/collision).
+return {
+	"stevearc/conform.nvim",
+	event = { "BufWritePre" },
+	cmd = { "ConformInfo" },
+	-- This will provide type hinting with LuaLS
+	---@module "conform"
+	---@type conform.setupOpts
+	opts = {
+		formatters_by_ft = require("config.languages").formatters_by_ft(),
+		-- Set default options
+		default_format_opts = {
+			lsp_format = "fallback",
+		},
+		-- Set up format-on-save
+		format_on_save = {
+			timeout_ms = 500,
+			lsp_fallback = true,
+		},
+		-- Customize formatters
+		formatters = {
+			shfmt = {
+				append_args = { "-i", "2" },
+			},
+		},
+	},
+	init = function()
+		-- If you want the formatexpr, here is the place to set it
+		vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+	end,
+}
